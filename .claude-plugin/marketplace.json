@@ -1,0 +1,12 @@
+{
+  "name": "gimwa",
+  "owner": { "name": "gimwa" },
+  "description": "gimwa's Claude Code plugins.",
+  "plugins": [
+    {
+      "name": "sop",
+      "source": "./",
+      "description": "Phased dev-workflow skills: charter → specify → design → implement → verify → ship."
+    }
+  ]
+}
