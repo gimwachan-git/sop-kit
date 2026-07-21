@@ -11,7 +11,7 @@ description: >-
   bundle; changed interactions and dependency upgrades need a real-browser check
   against the design system). A green gate is the Definition of Done.
 metadata:
-  version: 0.1.0
+  version: 0.2.0
   last_updated: 2026-07-21
 ---
 

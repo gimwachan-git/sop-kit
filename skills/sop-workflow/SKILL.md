@@ -7,9 +7,10 @@ description: >-
   spans several phases (spec + design + build + ship), or when you need to decide
   how heavy the process should be for a given project. It routes to the right
   phase skill (sop-charter / sop-specify / sop-design / sop-implement / sop-verify
-  / sop-ship) and hands the "how much" question to first-principles-software-development.
+  / sop-ship), points at sop-feedback / sop-maintain when the workflow itself needs
+  fixing, and hands the "how much" question to first-principles-software-development.
 metadata:
-  version: 0.1.0
+  version: 0.2.0
   last_updated: 2026-07-21
 ---
 
@@ -61,6 +62,20 @@ Pick the phase from what the user actually has in hand:
 Do not force a strict march. Jump straight to `sop-verify` for a hotfix; loop
 `specify → design → implement → verify` for one feature; run only `charter`
 for a spike. The router exists so you *choose* the phase, not skip thinking.
+
+## Improving the workflow itself
+
+Two more skills close the loop on the SOP, so a bad step gets fixed instead of
+worked around:
+
+- **`sop-feedback`** — from *any* project: a phase skill misled you, missed a
+  step, or you want a new capability → file it as an issue on the package.
+- **`sop-maintain`** — inside the `sop-kit` repo: read the open issues, fix the
+  skill, bump the version, release it to users.
+
+If you find yourself silently compensating for a skill's bad advice, that's the
+signal to run `sop-feedback` — an undocumented workaround is the same knowledge
+loss (P1) these skills exist to prevent.
 
 ## Tailoring by project weight (the whole point)
 

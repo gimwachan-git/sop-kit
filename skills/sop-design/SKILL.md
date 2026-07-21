@@ -10,7 +10,7 @@ description: >-
   architecture (e.g. FSD slice), and for UI-heavy work consults or creates
   design-system.md. This is the change-governance phase.
 metadata:
-  version: 0.1.0
+  version: 0.2.0
   last_updated: 2026-07-21
 ---
 

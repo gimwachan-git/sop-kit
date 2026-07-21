@@ -10,7 +10,7 @@ description: >-
   short clarify loop for genuine ambiguities. Cut this phase for single-developer
   projects where rules live in CLAUDE.md.
 metadata:
-  version: 0.1.0
+  version: 0.2.0
   last_updated: 2026-07-21
 ---
 

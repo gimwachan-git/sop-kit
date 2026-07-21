@@ -1,6 +1,6 @@
 {
   "name": "sop",
   "description": "Phased, template-driven development workflow as skills — charter → specify → design → implement → verify → ship — the execution layer that composes with first-principles software development.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": { "name": "gimwa" }
 }

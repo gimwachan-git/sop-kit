@@ -95,6 +95,7 @@ every commit a new version).
   plugin.json       # plugin manifest (name, version) — drives /plugin install & updates
   marketplace.json  # makes this repo its own marketplace (source: "./")
 bin/sop.sh          # optional manual installer for non-plugin use
+bin/bump.sh         # maintainer: bump the version everywhere it must stay in sync
 skills/
   sop-workflow/   router + tailoring entry point
   sop-charter/    docs/overview.md (goals + project parameters) + seed CLAUDE.md
@@ -103,7 +104,22 @@ skills/
   sop-implement/  task breakdown + FSD boundaries + the three pillars
   sop-verify/     run the gate chain = Definition of Done
   sop-ship/       version bump + build + deploy, in gated order
+  sop-feedback/   file an issue when a skill misleads you (from any project)
+  sop-maintain/   read issues, fix the skill, bump, release (inside this repo)
 ```
+
+## Feedback loop
+
+The workflow is meant to absorb correction. When a skill gives you bad or missing
+guidance, don't work around it silently:
+
+1. **`sop-feedback`** turns the pain point into a well-formed issue (uses `gh` when
+   available, otherwise a prefilled issue URL — no auth needed).
+2. **`sop-maintain`**, run inside this repo, reads the open issues, changes the
+   skill, runs `bin/bump.sh`, and pushes with `Fixes #N`.
+3. Users pick it up with `/plugin marketplace update gimwa && /plugin update sop@gimwa`.
+
+Issues can also be filed by hand — `.github/ISSUE_TEMPLATE/` carries the same structure.
 
 Skills are self-contained: SKILL.md plus any `templates/`. They reference the
 projects only as calibration examples, never as dependencies.
