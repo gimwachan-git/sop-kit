@@ -31,6 +31,12 @@ This is the section that rots fastest — update it as you finish each phase.]
 - [`docs/requirements/` — user stories + acceptance, if this project keeps them.]
 - `[src layout]` — [e.g. FSD layers, or crate layout; note cross-boundary rules.]
 - `[tests layout]` — [where tests live and what each layer asserts.]
+- **Docs↔code binding**: [every sliced-layer `index.ts` carries
+  `@domain <slug> [term]`, plus `@serves <doc> <ids>` where requirement docs
+  exist. Same slug across every layer of one capability — that slug is the only
+  name the capability has. Exempt: `shared/`, generated code, non-FSD trees.
+  `sop-verify` step 4 fails the gate on a missing `@domain`. Delete this line if
+  the project doesn't use a sliced architecture.]
 
 ## Business rules (easy to forget — obey these)
 

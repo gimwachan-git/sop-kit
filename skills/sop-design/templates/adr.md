@@ -8,7 +8,10 @@
 
 # NNNN — [Decision title, as an action]
 
-- Status: Accepted <!-- | Superseded by NNNN | Deferred -->
+- Status: Accepted <!-- | Superseded by NNNN | Deferred
+     "Deferred" = we chose NOT to choose yet: Decision names the abstraction you're
+     hiding behind plus the candidate shortlist. Supersede it when the real choice
+     lands. -->
 - Date: YYYY-MM-DD
 <!-- when this reverses an earlier decision, add:
 - Supersedes: ADR-000X (the "…" part)
@@ -21,7 +24,11 @@
 
 [The forces at play and the problem to solve. Fold the rationale in here: why this
 is a real decision, what constraints bound it, what alternatives exist. Written so
-a future reader understands *why*, not just *what*.]
+a future reader understands *why*, not just *what*.
+
+Research that fed this decision belongs here — stamped with the date it was
+verified ("rates checked 2026-07 against the official pricing pages"), because
+external facts go stale and a future reader needs to know how much to trust them.]
 
 ## Decision
 

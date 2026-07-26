@@ -8,10 +8,14 @@ description: >-
   Decision / Consequences), enforces the supersession discipline (never edit an
   old ADR — add a new one that supersedes it), decides where code lands under the
   architecture (e.g. FSD slice), and for UI-heavy work consults or creates
-  design-system.md. This is the change-governance phase.
+  design-system.md. Also owns where investigation/research results live — in a made
+  decision's Context, in a Deferred ADR when the choice is postponed, or in
+  docs/research/<yyyy-mm>-<topic>.md when no decision is on the table yet — so use
+  it when asking "where do survey or comparison findings go". This is the
+  change-governance phase.
 metadata:
-  version: 0.2.0
-  last_updated: 2026-07-21
+  version: 0.4.0
+  last_updated: 2026-07-26
 ---
 
 # sop-design — record the decision
@@ -43,29 +47,59 @@ reversible, local choices — but when in doubt, one 15-line ADR is cheap insura
    - `## Consequences` — what this makes easy, hard, or obliges. Include the cost.
    - Optional `## Rationale` if the "why" is subtle enough to deserve its own section.
 
-3. **Supersession discipline (critical).** Never edit or delete an old ADR. To
+3. **Place the research.** Investigation is perishable evidence — always stamp the
+   date it was verified. Where it lands depends on whether a decision is on the table:
+   - **Decision made** → it belongs in that ADR's `## Context`. Don't leave it in a
+     separate file the ADR merely gestures at.
+   - **Decision deliberately deferred** → the deferral *is* the decision. Write the
+     ADR with `Status: Deferred`: Decision = the abstraction you're hiding behind
+     plus the candidate shortlist; the research goes in its Context. Supersede it
+     when the real choice lands.
+   - **No decision on the table yet** (a pure survey — "three ways to deploy X",
+     a vendor/fee comparison with nothing to pick between yet) → **you don't need
+     an ADR**. Write `docs/research/<yyyy-mm>-<topic>.md`, link it from
+     `overview.md`'s Open Questions, and cite it from the ADR that eventually
+     consumes it.
+
+   The failure mode this prevents: a survey that cost real effort dies with the
+   chat session, or gets smuggled into an ADR for a decision nobody actually made.
+
+4. **Supersession discipline (critical).** Never edit or delete an old ADR. To
    change a past decision, write a **new** ADR that:
    - names the old number and **which part** it replaces (`Supersedes ADR-000X (the "…" part)`), and
    - flip the old ADR's status line to `Superseded by NNNN`.
    The log is append-only; the history of *why it changed* is the point.
 
-4. **Place the code under the architecture.** Decide which layer/slice/module the
-   change belongs to and state it in Consequences (e.g. FSD: which of
-   `app/pages/widgets/features/entities/shared`; cross-slice access only via the
-   slice's public `index.ts`). A boundary decision is itself ADR-worthy.
+5. **Place the code under the architecture, and name its domain.** Decide which
+   layer/slice/module the change belongs to and state it in Consequences (e.g.
+   FSD: which of `app/pages/widgets/features/entities/shared`; cross-slice access
+   only via the slice's public `index.ts`). A boundary decision is itself
+   ADR-worthy.
 
-5. **UI work → design system.** If the change touches visual/interaction design,
+   Then decide the **`@domain` slug** the new code carries. A capability normally
+   spans several layers — a page, a widget, one or two features, an entity — and
+   FSD has **no concept for that grouping**: slice groups are within-layer, and
+   nothing in the spec names a cross-layer capability. The slug is that missing
+   name, and it is the only thing tying the slice back to the document that
+   justifies it. Reuse an existing slug if the change extends a known domain;
+   coining a new one is itself a small decision worth a line in Consequences.
+   `sop-implement` writes it into `index.ts`; `sop-verify` fails the gate if it's
+   missing.
+
+6. **UI work → design system.** If the change touches visual/interaction design,
    consult `docs/design-system.md` (tokens, per-element state tables, the
    "paid in blood" implementation rules, the UI checklist). Create it from
    `templates/design-system.md` if the project is UI-heavy and lacks one.
 
-6. **Update the ADR index** (`docs/adr/README.md`) — a one-line entry; carry the
+7. **Update the ADR index** (`docs/adr/README.md`) — a one-line entry; carry the
    supersedes/superseded relationship in the status column/annotation.
 
 ## Where the artifact goes
 
 - `docs/adr/NNNN-<slug>.md` — the decision record.
 - `docs/adr/README.md` — the index with cross-references.
+- `docs/research/<yyyy-mm>-<topic>.md` — dated investigation with no decision on
+  the table yet; linked from `overview.md`'s Open Questions.
 - `docs/design-system.md` — UI tokens + interaction rules + checklist (UI projects).
 
 ## Quality checklist / Gate
@@ -75,6 +109,9 @@ reversible, local choices — but when in doubt, one 15-line ADR is cheap insura
 - [ ] Consequences name the costs and obligations, not only the benefits.
 - [ ] If it reverses a past decision: old ADR marked `Superseded by NNNN`, new one
       names the old number and the superseded part. No old ADR was edited in place.
+- [ ] Any research is stamped with the date it was verified, and has a home — this
+      ADR's Context, or `docs/research/` linked from Open Questions. None of it
+      exists only in the chat.
 - [ ] Index updated; cross-references present.
 
 ## Tailoring by project weight
@@ -86,7 +123,9 @@ reversible, local choices — but when in doubt, one 15-line ADR is cheap insura
   code/git history rather than recorded at the time.
 - **Bare**: no ADR log yet — but the first time you make a choice you'd have to
   reverse-engineer later, start one. A repo whose only doc is a README that has
-  drifted from the code is the failure mode this phase prevents.
+  drifted from the code is the failure mode this phase prevents. Research is the
+  exception that survives the cut: a 10-line dated `docs/research/` note is always
+  cheaper than running the investigation again.
 
 When unsure how formal to be, invoke `first-principles-software-development`
 (this is a P1+P4 question).
@@ -95,7 +134,9 @@ When unsure how formal to be, invoke `first-principles-software-development`
 
 - [ ] `docs/adr/NNNN-*.md` written and passes the checklist.
 - [ ] Any superseded ADR re-statused; index updated.
-- [ ] Code placement (layer/slice) decided and recorded.
+- [ ] Research placed and dated (ADR Context, Deferred ADR, or `docs/research/`).
+- [ ] Code placement (layer/slice) decided and recorded, and its `@domain` slug
+      named — reused from an existing domain, or coined deliberately.
 
 ## Next
 

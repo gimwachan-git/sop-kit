@@ -10,8 +10,8 @@ description: >-
   prefilled issue URL (no auth needed) when it isn't. Use sop-maintain to act on
   the issue from inside the package repo.
 metadata:
-  version: 0.2.0
-  last_updated: 2026-07-21
+  version: 0.4.0
+  last_updated: 2026-07-26
 ---
 
 # sop-feedback — turn a pain point into an issue

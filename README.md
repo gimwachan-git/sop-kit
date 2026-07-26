@@ -96,13 +96,14 @@ every commit a new version).
   marketplace.json  # makes this repo its own marketplace (source: "./")
 bin/sop.sh          # optional manual installer for non-plugin use
 bin/bump.sh         # maintainer: bump the version everywhere it must stay in sync
+docs/adr/           # this package's own decisions (why the skills are shaped this way)
 skills/
   sop-workflow/   router + tailoring entry point
   sop-charter/    docs/overview.md (goals + project parameters) + seed CLAUDE.md
   sop-specify/    docs/requirements/<feature>.md (US + acceptance) + traceability.md
-  sop-design/     docs/adr/NNNN-*.md + FSD placement + optional design-system.md
-  sop-implement/  task breakdown + FSD boundaries + the three pillars
-  sop-verify/     run the gate chain = Definition of Done
+  sop-design/     docs/adr/NNNN-*.md + docs/research/ + FSD placement + @domain slug + optional design-system.md
+  sop-implement/  task breakdown + FSD boundaries + @domain/@serves headers + the three pillars
+  sop-verify/     run the gate chain, incl. the docs<->code binding check = Definition of Done
   sop-ship/       version bump + build + deploy, in gated order
   sop-feedback/   file an issue when a skill misleads you (from any project)
   sop-maintain/   read issues, fix the skill, bump, release (inside this repo)

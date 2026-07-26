@@ -10,8 +10,8 @@ description: >-
   short clarify loop for genuine ambiguities. Cut this phase for single-developer
   projects where rules live in CLAUDE.md.
 metadata:
-  version: 0.2.0
-  last_updated: 2026-07-21
+  version: 0.4.0
+  last_updated: 2026-07-26
 ---
 
 # sop-specify — specify the feature
@@ -50,12 +50,25 @@ recorded cut, not forgetfulness).
    relevant AC. Skip questions with a reasonable default — record the default as
    an assumption instead of asking.
 
-4. **Update `docs/traceability.md`** (heavy projects): one row per AC —
+4. **Keep the ids stable and citable.** `US-N` / `AC-m` headings are what slices
+   and tests point at, so treat renumbering as a breaking change: append rather
+   than reorder, and strike a retired story in place (`US-B5 ~~…~~ superseded by
+   US-B7`) instead of shifting everything below it. A positional id that silently
+   shifts invalidates every citation elsewhere in the repo.
+
+5. **Update `docs/traceability.md`** (heavy projects): one row per AC —
    `requirement ↔ implementation location ↔ verifying test ↔ status` — with honest
    status markers (✅ done / ⚠️ partial / ❌ gap). New ACs start as gaps.
+   **Derive the implementation column, don't author it** — it is `grep -rl
+   '@serves.*<this doc>' src/`. A hand-maintained matrix silently stops matching
+   the code: the failure mode is a matrix with no row for a slice that quietly
+   rewrites production data, while the header still describes a release that
+   shipped months ago.
 
-5. **Point tests at the ACs.** Tests name their source (`US-N AC-m`) so the link is
-   auditable. The spec, the code, and the test stay traceable to one another.
+6. **Point tests at the ACs.** Tests name their source (`US-N AC-m`) so the link is
+   auditable. The spec, the code, and the test stay traceable to one another —
+   this and the slice's `@serves` header are the two links that survive, because
+   one is re-run by CI and the other moves with the file.
 
 ## Where the artifact goes
 
@@ -77,7 +90,9 @@ in an ADR if a teammate proposes it again.)
 - [ ] Every AC is concrete, testable, and unambiguous (a tester couldn't argue it).
 - [ ] No `[NEEDS CLARIFICATION]` markers left unresolved (or ≤3, flagged).
 - [ ] Success is measurable and technology-agnostic (no framework names in the AC).
-- [ ] Traceability rows added for new ACs (heavy projects), gaps marked honestly.
+- [ ] Story/AC ids are stable — nothing renumbered out from under an existing citation.
+- [ ] Traceability rows added for new ACs (heavy projects), gaps marked honestly,
+      implementation column derived from `@serves` rather than typed by hand.
 
 ## Tailoring by project weight
 
