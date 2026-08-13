@@ -11,8 +11,8 @@ description: >-
   obeys the project's business rules. Adapts to the stack (Nuxt/TS, Rust
   workspace, etc.). Ends by handing off to sop-verify.
 metadata:
-  version: 0.4.0
-  last_updated: 2026-07-26
+  version: 0.5.0
+  last_updated: 2026-08-13
 ---
 
 # sop-implement — build it
@@ -95,7 +95,8 @@ must pass). Use it when the decision is settled and code is the next step.
      (stalling a navigation to observe a transient), you picked the wrong layer and
      just lengthened the loop you were shortening. `sop-verify` #5 is the full rule.
    - **Externalize decisions (P1):** if you make a real choice mid-implementation,
-     leave an ADR (even one line) — don't bury it in a diff.
+     leave an ADR (even one line) — don't bury it in a diff. As `Proposed`, unless
+     the owner already sanctioned that exact choice (sop-design's consent gate).
    - **Maintain alignment (P2):** point at the shared reference (interface
      contract, running prototype) rather than prose when syncing intent.
 

@@ -10,8 +10,8 @@ description: >-
   short clarify loop for genuine ambiguities. Cut this phase for single-developer
   projects where rules live in CLAUDE.md.
 metadata:
-  version: 0.4.0
-  last_updated: 2026-07-26
+  version: 0.5.0
+  last_updated: 2026-08-13
 ---
 
 # sop-specify — specify the feature

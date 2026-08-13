@@ -16,8 +16,8 @@ description: >-
   modules and built-nothing requirements surface here instead of never. A green
   gate is the Definition of Done.
 metadata:
-  version: 0.4.0
-  last_updated: 2026-07-26
+  version: 0.5.0
+  last_updated: 2026-08-13
 ---
 
 # sop-verify — run the gate (Definition of Done)

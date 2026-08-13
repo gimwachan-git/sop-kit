@@ -9,8 +9,8 @@ description: >-
   notes the deploy:raw escape hatch without encouraging it, and updates CLAUDE.md's
   current phase after shipping. This is the release-governance phase.
 metadata:
-  version: 0.4.0
-  last_updated: 2026-07-26
+  version: 0.5.0
+  last_updated: 2026-08-13
 ---
 
 # sop-ship — release it

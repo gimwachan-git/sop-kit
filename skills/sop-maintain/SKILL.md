@@ -9,8 +9,8 @@ description: >-
   every user's /plugin update is a silent no-op. Pairs with sop-feedback, which
   files the issues from the consuming side.
 metadata:
-  version: 0.4.0
-  last_updated: 2026-07-26
+  version: 0.5.0
+  last_updated: 2026-08-13
 ---
 
 # sop-maintain — act on feedback, then release
