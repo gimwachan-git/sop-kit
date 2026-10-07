@@ -10,8 +10,8 @@ description: >-
   / sop-ship), points at sop-feedback / sop-maintain when the workflow itself needs
   fixing, and hands the "how much" question to first-principles-software-development.
 metadata:
-  version: 0.5.0
-  last_updated: 2026-08-13
+  version: 0.6.0
+  last_updated: 2026-10-07
 ---
 
 # sop-workflow — the workflow router
@@ -37,7 +37,7 @@ Two layers work together:
 |-------|-------|--------|----------|
 | 0 · Charter | `sop-charter` | P1 externalize · P2 align · sets project parameters | `docs/overview.md` + seeded `CLAUDE.md` |
 | 1 · Specify | `sop-specify` | P2 alignment (+P1) | `docs/requirements/<feature>.md` + `docs/traceability.md` |
-| 2 · Design | `sop-design` | P1 + P2 + P4 change governance | `docs/adr/NNNN-*.md` (+ `docs/research/` for undecided surveys, + optional `design-system.md`) |
+| 2 · Design | `sop-design` | P1 + P2 + P4 change governance | `docs/adr/NNNN-*.md` (+ `docs/research/` for any survey, decided or not, + optional `design-system.md`) |
 | 3 · Implement | `sop-implement` | construction | code under FSD boundaries + `@domain`/`@serves` headers + the three pillars |
 | 4 · Verify | `sop-verify` | P3 early detection · P5 trust | the gate chain runs green (incl. the docs↔code binding check) = Definition of Done |
 | 5 · Ship | `sop-ship` | P4 + P5 | version bump + build + deploy, in gated order |
@@ -57,9 +57,12 @@ Pick the phase from what the user actually has in hand:
   dependency bump, data shape) → `sop-design` (write an ADR).
 - **You ran an investigation and don't know where the findings go** (a vendor/fee
   comparison, "three ways to do X", anything dated and perishable) → also
-  `sop-design`: its "place the research" step routes it to an ADR's Context, a
-  `Deferred` ADR, or `docs/research/<yyyy-mm>-<topic>.md` when no decision is on
-  the table yet. Research that only exists in the chat session is P1 loss.
+  `sop-design`: its "place the research" step writes anything that compares
+  options or cites sources as a dated `docs/research/<yyyy-mm>-<topic>.md` note —
+  summarized and cited by the ADR that consumes it, by a `Deferred` ADR when the
+  choice is postponed, or standing alone while no decision is on the table; only
+  a few lines of evidence go inline. Research that only exists in the chat
+  session is P1 loss.
 - **Decision made, ready to write code** → `sop-implement`.
 - **Code written, need to know if it's actually done/safe** → `sop-verify`.
 - **"Which requirement does this module serve?" has no answer** (docs and slices

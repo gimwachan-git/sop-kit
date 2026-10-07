@@ -26,9 +26,12 @@
 is a real decision, what constraints bound it, what alternatives exist. Written so
 a future reader understands *why*, not just *what*.
 
-Research that fed this decision belongs here — stamped with the date it was
-verified ("rates checked 2026-07 against the official pricing pages"), because
-external facts go stale and a future reader needs to know how much to trust them.]
+A few lines of dated evidence belong here ("rates checked 2026-07 against the
+official pricing pages"), because external facts go stale and a future reader needs
+to know how much to trust them. A survey that compares options or cites sources
+lives in docs/research/<yyyy-mm>-<topic>.md: summarize it here (the forces, one
+verdict line per option, the caveats that shape the implementation) and cite the
+note. This file is frozen once Accepted; the note can be re-verified.]
 
 ## Decision
 

@@ -8,14 +8,16 @@ description: >-
   Decision / Consequences), enforces the supersession discipline (never edit an
   old ADR — add a new one that supersedes it), decides where code lands under the
   architecture (e.g. FSD slice), and for UI-heavy work consults or creates
-  design-system.md. Also owns where investigation/research results live — in a made
-  decision's Context, in a Deferred ADR when the choice is postponed, or in
-  docs/research/<yyyy-mm>-<topic>.md when no decision is on the table yet — so use
-  it when asking "where do survey or comparison findings go". This is the
-  change-governance phase.
+  design-system.md. Also owns where investigation/research results live — any
+  survey that compares options or cites sources becomes a dated
+  docs/research/<yyyy-mm>-<topic>.md note written before the ADR and summarized
+  and cited from the ADR's Context (or from a Deferred ADR when the choice is
+  postponed, or standing alone while no decision is on the table); only a few
+  lines of evidence go inline — so use it when asking "where do survey or
+  comparison findings go". This is the change-governance phase.
 metadata:
-  version: 0.5.0
-  last_updated: 2026-08-13
+  version: 0.6.0
+  last_updated: 2026-10-07
 ---
 
 # sop-design — record the decision
@@ -60,21 +62,41 @@ reversible, local choices — but when in doubt, one 15-line ADR is cheap insura
    is P4 pollution, not history.
 
 3. **Place the research.** Investigation is perishable evidence — always stamp the
-   date it was verified. Where it lands depends on whether a decision is on the table:
-   - **Decision made** → it belongs in that ADR's `## Context`. Don't leave it in a
-     separate file the ADR merely gestures at.
+   date it was verified. Where it lands is decided by its **size and lifecycle**,
+   not only by whether a decision is on the table:
+   - **A few lines of evidence** (one price checked, one API confirmed) → inline
+     in the ADR's `## Context`, dated.
+   - **A survey** — anything that compares options, cites external sources, or
+     records versions, prices or statuses that will go stale → its own
+     `docs/research/<yyyy-mm>-<topic>.md` with sources, the verification date and
+     the gaps it did not close. The ADR's `## Context` then carries a summary that
+     **stands alone** (the forces, one verdict line per option, the caveats that
+     shape the implementation) and cites the note. Both halves are required: an
+     ADR that only gestures at a note is unreadable, and a survey folded into an
+     ADR is frozen the day the ADR is accepted and can never be re-verified.
    - **Decision deliberately deferred** → the deferral *is* the decision. Write the
      ADR with `Status: Deferred`: Decision = the abstraction you're hiding behind
-     plus the candidate shortlist; the research goes in its Context. Supersede it
-     when the real choice lands.
+     plus the candidate shortlist; its Context summarizes and cites the note.
+     Supersede it when the real choice lands.
    - **No decision on the table yet** (a pure survey — "three ways to deploy X",
-     a vendor/fee comparison with nothing to pick between yet) → **you don't need
-     an ADR**. Write `docs/research/<yyyy-mm>-<topic>.md`, link it from
-     `overview.md`'s Open Questions, and cite it from the ADR that eventually
-     consumes it.
+     a vendor/fee comparison with nothing to pick between yet) → the note alone,
+     **no ADR**. Link it from `overview.md`'s Open Questions and cite it from the
+     ADR that eventually consumes it.
 
-   The failure mode this prevents: a survey that cost real effort dies with the
-   chat session, or gets smuggled into an ADR for a decision nobody actually made.
+   Write the note **before** the ADR and hand both to the owner together: the
+   consent gate in step 2 is a review of the evidence, so the evidence must be a
+   document the owner can open on its own, separate from the proposal. Keep a
+   one-line index in `docs/research/README.md`.
+
+   Paid for in a real project: a six-option stack survey was folded into a
+   `Proposed` ADR because "a decision was on the table". The ADR reached 117
+   lines against the template's 10–30, and the owner's first reaction was to ask
+   where the research report was — they wanted to read the evidence before
+   consenting, apart from the proposal.
+
+   The failure modes this prevents: a survey that cost real effort dies with the
+   chat session; gets smuggled into an ADR for a decision nobody actually made; or
+   is frozen inside an accepted ADR where its perishable facts can never be re-verified.
 
 4. **Supersession discipline (critical).** Never edit or delete an old ADR. To
    change a past decision, write a **new** ADR that:
@@ -113,8 +135,10 @@ reversible, local choices — but when in doubt, one 15-line ADR is cheap insura
 
 - `docs/adr/NNNN-<slug>.md` — the decision record.
 - `docs/adr/README.md` — the index with cross-references.
-- `docs/research/<yyyy-mm>-<topic>.md` — dated investigation with no decision on
-  the table yet; linked from `overview.md`'s Open Questions.
+- `docs/research/<yyyy-mm>-<topic>.md` — dated investigation: every survey that
+  compares options or cites sources, whether or not an ADR consumes it. Linked
+  from `overview.md`'s Open Questions while undecided, cited from the ADR once one
+  exists; one-line index in `docs/research/README.md`.
 - `docs/design-system.md` — UI tokens + interaction rules + checklist (UI projects).
 
 ## Quality checklist / Gate
@@ -127,9 +151,12 @@ reversible, local choices — but when in doubt, one 15-line ADR is cheap insura
 - [ ] Consequences name the costs and obligations, not only the benefits.
 - [ ] If it reverses a past decision: old ADR marked `Superseded by NNNN`, new one
       names the old number and the superseded part. No old ADR was edited in place.
-- [ ] Any research is stamped with the date it was verified, and has a home — this
-      ADR's Context, or `docs/research/` linked from Open Questions. None of it
-      exists only in the chat.
+- [ ] Any research is stamped with the date it was verified, and has a home: a few
+      lines inline in this ADR's Context, or — for anything that compares options
+      or cites sources — its own `docs/research/` note that this ADR's Context
+      summarizes **and** cites. None of it exists only in the chat.
+- [ ] The ADR stays near the template's size (10–30 lines of prose plus a short
+      table). If it has grown past that, the survey belongs in `docs/research/`.
 - [ ] Index updated; cross-references present.
 
 ## Tailoring by project weight
@@ -152,7 +179,8 @@ When unsure how formal to be, invoke `first-principles-software-development`
 
 - [ ] `docs/adr/NNNN-*.md` written and passes the checklist.
 - [ ] Any superseded ADR re-statused; index updated.
-- [ ] Research placed and dated (ADR Context, Deferred ADR, or `docs/research/`).
+- [ ] Research placed and dated: a few lines inline, otherwise a `docs/research/`
+      note written before the ADR and summarized and cited from it.
 - [ ] Code placement (layer/slice) decided and recorded, and its `@domain` slug
       named — reused from an existing domain, or coined deliberately.
 

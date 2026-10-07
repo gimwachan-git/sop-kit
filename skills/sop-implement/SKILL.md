@@ -11,8 +11,8 @@ description: >-
   obeys the project's business rules. Adapts to the stack (Nuxt/TS, Rust
   workspace, etc.). Ends by handing off to sop-verify.
 metadata:
-  version: 0.5.0
-  last_updated: 2026-08-13
+  version: 0.6.0
+  last_updated: 2026-10-07
 ---
 
 # sop-implement — build it
