@@ -9,8 +9,8 @@ description: >-
   pick the project up. This is where project parameters are fixed, which every
   later phase reads to decide its own weight.
 metadata:
-  version: 0.6.0
-  last_updated: 2026-10-07
+  version: 0.7.0
+  last_updated: 2026-10-13
 ---
 
 # sop-charter — charter the project

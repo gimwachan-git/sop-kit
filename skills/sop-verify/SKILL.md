@@ -13,11 +13,14 @@ description: >-
   its risk — component vs E2E). It also checks the docs-to-code binding both ways
   — every sliced-layer public API declares its @domain, every @serves target still
   resolves, every requirement doc is claimed by some slice — so undocumented
-  modules and built-nothing requirements surface here instead of never. A green
+  modules and built-nothing requirements surface here instead of never. And it
+  checks the UI design doc (an OOUI object/view model, a screen map, the page
+  table in design-system.md) against the user stories and the screens actually
+  shipped, so a design doc that silently fell behind the UI is caught. A green
   gate is the Definition of Done.
 metadata:
-  version: 0.6.0
-  last_updated: 2026-10-07
+  version: 0.7.0
+  last_updated: 2026-10-13
 ---
 
 # sop-verify — run the gate (Definition of Done)
@@ -117,7 +120,61 @@ repeatable signal. Run it before declaring a change done and before every ship.
    its own slice only when it's reused across pages, so single-page stories live
    in `pages/` and that is correct.
 
-5. **Do not hard-code counts.** Report pass/fail and the failing output, not
+5. **Check the UI design ↔ stories ↔ code binding** (projects that keep a UI
+   design doc — an OOUI object/view model, a screen map, or the page-structure
+   table in `docs/design-system.md`). A UI design doc rots faster than a
+   requirement doc: owner feedback arrives as "make this screen simpler", the code
+   changes in minutes, and nothing points back at the doc. Real failure: six UI
+   commits — a simplified preview, a back-button confirm, an accordion, new
+   actions on two objects — landed after the OOUI doc's last edit; the doc still
+   described screens that no longer existed, and nothing flagged it until the
+   owner asked "was this synced?". Three checks:
+
+   ```bash
+   # a. freshness — UI commits made after the design doc last changed.
+   #    Adjust both path lists to the project (Nuxt: pages/ components/;
+   #    Expo Router: app/; FSD: src/pages src/widgets). Paths are written out,
+   #    not kept in a variable: zsh does not word-split "$var", so a
+   #    space-separated list silently becomes one path that matches nothing.
+   #    Check each design doc on its own: one doc keeping pace does not cover
+   #    another (real failure: design-system.md was updated with every change,
+   #    the OOUI doc was not, and a combined check reported "fresh").
+   for doc in docs/design/ooui.md docs/design-system.md; do
+     [ -e "$doc" ] || continue
+     last=$(git log -1 --format=%H -- "$doc")
+     echo "== UI commits since $doc last changed:"
+     git log --oneline ${last:+$last..}HEAD -- app src/pages src/widgets
+   done
+   # b. stories → design — every user story is covered by the design's task /
+   #    object analysis (OOUI step 1) or marked deferred / retired there.
+   grep -ho '^## US-[0-9]*' docs/requirements/*.md | awk '{print $2}' | sort -u |
+     while read -r us; do
+       grep -rqw "$us" docs/design docs/design-system.md 2>/dev/null ||
+         echo "no design for: $us"
+     done
+   # c. design ↔ code — list the routes, then compare by hand with the view table
+   #    (names never match mechanically). Every route belongs to some view; every
+   #    view row is a route, or is marked "later".
+   find app src/pages -name '*.tsx' -o -name '*.vue' 2>/dev/null | grep -v '_layout'
+   ```
+
+   - **(a) non-empty is not automatically red** — read each listed commit. Either
+     the design doc gets the change (OOUI: the object's attributes / actions, the
+     view table, navigation constraints) or the commit is a pure refactor with no
+     design meaning. Red is a listed commit nobody has looked at.
+   - **(b) a story with no screen** (an importer, a background sync) or one that
+     is retired / deferred gets one line in the design doc's task table saying
+     so. That is cheaper than an exemption list, and it tells the next reader the
+     story was considered rather than forgotten.
+   - **A UI change that contradicts an acceptance criterion is a spec change.**
+     Revise the AC in place (dated, with the reason) in the same change, or the
+     gate is red: the doc says "group by section", the screen no longer does, and
+     both can't be the contract.
+   - **OOUI specifics**: every action the UI exposes appears on its object (on the
+     collection or the single view); actions in the model that the UI does not
+     have yet are marked as later, not silently missing.
+
+6. **Do not hard-code counts.** Report pass/fail and the failing output, not
    "N tests pass" — test counts drift across docs and lock nothing down.
 
 ## Where the result goes
@@ -140,19 +197,26 @@ record it with an ADR and update `CLAUDE.md` / `overview.md`'s check list.
 - [ ] Docs↔code binding checked both ways: no sliced-layer `index.ts` without
       `@domain`, no `@serves` pointing at a path that no longer exists, no
       requirement doc that nothing claims.
+- [ ] UI design doc (if any) is not behind the code: every UI commit since its
+      last edit was reviewed, every user story is covered or marked deferred,
+      every route maps to a view, and no screen contradicts an AC that wasn't
+      revised.
 
 ## Tailoring by project weight
 
 - **Heavy**: full gate + CI enforcing lint / boundaries / typecheck; layered tests
   (unit / property / scenario) plus the smoke. Run step 4 in CI, and add `@rev`
   so a requirement that changed under a slice reports stale instead of silent.
+  Run step 5 (a) and (b) in CI as warnings; (c) stays a human review.
 - **Light**: local `verify` + `verify:cf` scripts chained; a single focused smoke
   suite is the whole test programme — make sure it covers the recurring failure mode.
   Step 4 runs locally; `@domain` + `@serves`, no `@rev`, no matrix.
+  Step 5 runs locally whenever a UI change landed since the last gate.
 - **Bare**: `cargo test` (or the one command that exists) + eyeballing fixtures.
   If there's no gate at all, that's the finding — propose the smallest useful one.
   Of step 4, keep only grep (a) and (d): `@domain` alone is nearly free and still
   buys the glossary, even in a project that cut requirement docs entirely.
+  Step 5 applies only if a UI design doc exists; then keep (a) — it is one command.
 
 Whether a missing check is worth adding is a P3 cost/benefit question — invoke
 `first-principles-software-development` when unsure.
