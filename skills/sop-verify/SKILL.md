@@ -19,8 +19,8 @@ description: >-
   shipped, so a design doc that silently fell behind the UI is caught. A green
   gate is the Definition of Done.
 metadata:
-  version: 0.7.0
-  last_updated: 2026-10-13
+  version: 0.8.0
+  last_updated: 2026-10-14
 ---
 
 # sop-verify — run the gate (Definition of Done)
@@ -156,6 +156,11 @@ repeatable signal. Run it before declaring a change done and before every ship.
    #    (names never match mechanically). Every route belongs to some view; every
    #    view row is a route, or is marked "later".
    find app src/pages -name '*.tsx' -o -name '*.vue' 2>/dev/null | grep -v '_layout'
+   # d. view contents ↔ code — (c) only proves each view has a route. Now open
+   #    each view row and each route file side by side and tick off what the row
+   #    promises: controls (search, filters, segments), sections and their order,
+   #    empty states, and every action. Again by hand; this is the step that
+   #    catches a screen that exists but is missing half of its design.
    ```
 
    - **(a) non-empty is not automatically red** — read each listed commit. Either
@@ -173,6 +178,18 @@ repeatable signal. Run it before declaring a change done and before every ship.
    - **OOUI specifics**: every action the UI exposes appears on its object (on the
      collection or the single view); actions in the model that the UI does not
      have yet are marked as later, not silently missing.
+   - **(d) is the code-behind-the-design direction** — (a) catches the doc
+     behind the code, (d) catches the code behind the doc. Real failure: the
+     OOUI view table said the exercise library has "search and muscle filters at
+     the top"; the picker screen (the same collection view, used for selecting)
+     had them, the library screen did not, and (a)–(c) were all green because the
+     route existed and the doc was fresh. The owner found it by using the app.
+     Each promised element is either on screen or marked "later" in the row.
+   - **One view, one implementation.** When two routes render the same view
+     (OOUI: a collection shown for browsing and again for picking), they share
+     the component that draws it — search bar, filters, row. Two hand-written
+     copies drift; that drift is the failure above. Red is a view row whose
+     routes each build the same control themselves.
 
 6. **Do not hard-code counts.** Report pass/fail and the failing output, not
    "N tests pass" — test counts drift across docs and lock nothing down.
@@ -199,7 +216,9 @@ record it with an ADR and update `CLAUDE.md` / `overview.md`'s check list.
       requirement doc that nothing claims.
 - [ ] UI design doc (if any) is not behind the code: every UI commit since its
       last edit was reviewed, every user story is covered or marked deferred,
-      every route maps to a view, and no screen contradicts an AC that wasn't
+      every route maps to a view, every view row's promised controls, sections
+      and actions are on its screen (or marked later), routes that render the same
+      view share its component, and no screen contradicts an AC that wasn't
       revised.
 
 ## Tailoring by project weight

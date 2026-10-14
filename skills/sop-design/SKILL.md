@@ -16,8 +16,8 @@ description: >-
   lines of evidence go inline — so use it when asking "where do survey or
   comparison findings go". This is the change-governance phase.
 metadata:
-  version: 0.7.0
-  last_updated: 2026-10-13
+  version: 0.8.0
+  last_updated: 2026-10-14
 ---
 
 # sop-design — record the decision
