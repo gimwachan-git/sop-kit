@@ -11,7 +11,7 @@ description: >-
   obeys the project's business rules. Adapts to the stack (Nuxt/TS, Rust
   workspace, etc.). Ends by handing off to sop-verify.
 metadata:
-  version: 0.8.0
+  version: 0.9.0
   last_updated: 2026-10-14
 ---
 
@@ -88,6 +88,25 @@ must pass). Use it when the decision is settled and code is the next step.
    enforced lands around 40% coverage and is then worse than nothing (you trust
    a map with holes in it).
 
+   **Screens declare their view the same way.** When the project's UI design doc
+   gives views and elements ids (`sop-design` step 6), every route / page file
+   names the view it renders, and every promised control carries its element id
+   as a `testID` (or the stack's equivalent: `data-testid`, an accessibility
+   identifier):
+
+   ```tsx
+   /**
+    * @view  exercise.collection
+    */
+   <TextInput testID="exercise.collection#search" … />
+   ```
+
+   Two routes rendering the same view (a collection browsed here and picked
+   from there) share the component that draws its elements, so each element id
+   is written in exactly one source file — `sop-verify` fails the gate when it
+   isn't. The `testID` doubles as the hook for a later E2E tool (Maestro,
+   Playwright), so nothing is redone when one arrives.
+
 4. **Keep the three pillars alive while coding:**
    - **Short feedback loop (P3/A6):** get something runnable in front of reality
      early; don't pile all verification to the end. Put each asserting test in the
@@ -124,6 +143,9 @@ is re-read on every CI run, and a header moves with the file it describes.
 - [ ] Architecture boundaries respected (public API only; correct layer direction).
 - [ ] Every new/touched slice's `index.ts` carries `@domain` (and `@serves` where
       the project keeps requirement docs); `shared/` and generated code exempt.
+- [ ] Every new/touched screen declares `@view`, and every control its view row
+      promises carries the element id, drawn in one shared component (projects
+      whose UI design doc has ids).
 - [ ] Business-rule invariants upheld in rule-bearing code.
 - [ ] Any mid-flight decision externalized as an ADR.
 - [ ] New behavior has an asserting test where the project keeps tests, in the layer

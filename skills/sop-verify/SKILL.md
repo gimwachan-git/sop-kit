@@ -19,7 +19,7 @@ description: >-
   shipped, so a design doc that silently fell behind the UI is caught. A green
   gate is the Definition of Done.
 metadata:
-  version: 0.8.0
+  version: 0.9.0
   last_updated: 2026-10-14
 ---
 
@@ -128,7 +128,7 @@ repeatable signal. Run it before declaring a change done and before every ship.
    commits — a simplified preview, a back-button confirm, an accordion, new
    actions on two objects — landed after the OOUI doc's last edit; the doc still
    described screens that no longer existed, and nothing flagged it until the
-   owner asked "was this synced?". Three checks:
+   owner asked "was this synced?". Four checks:
 
    ```bash
    # a. freshness — UI commits made after the design doc last changed.
@@ -152,16 +152,33 @@ repeatable signal. Run it before declaring a change done and before every ship.
        grep -rqw "$us" docs/design docs/design-system.md 2>/dev/null ||
          echo "no design for: $us"
      done
-   # c. design ↔ code — list the routes, then compare by hand with the view table
-   #    (names never match mechanically). Every route belongs to some view; every
-   #    view row is a route, or is marked "later".
-   find app src/pages -name '*.tsx' -o -name '*.vue' 2>/dev/null | grep -v '_layout'
-   # d. view contents ↔ code — (c) only proves each view has a route. Now open
-   #    each view row and each route file side by side and tick off what the row
-   #    promises: controls (search, filters, segments), sections and their order,
-   #    empty states, and every action. Again by hand; this is the step that
-   #    catches a screen that exists but is missing half of its design.
+   # c. design ↔ code, by id (sop-design step 6, sop-implement step 3).
+   #    Adjust doc and roots. `later:` ids are skipped by the patterns.
+   doc=docs/design/ooui.md; t=$(mktemp -d)
+   grep -o '`@view [a-z0-9.-]*`' "$doc" | tr -d '`' | awk '{print $2}' | sort -u > "$t/vd"
+   grep -rhoE '@view +[a-z0-9.-]+' app src 2>/dev/null | awk '{print $2}' | sort -u > "$t/vc"
+   comm -23 "$t/vd" "$t/vc" | sed 's/^/view no screen renders: /'
+   comm -13 "$t/vd" "$t/vc" | sed 's/^/screen claims undesigned view: /'
+   find app src/pages -name '*.tsx' ! -name '_layout*' 2>/dev/null |
+     while read -r f; do grep -q '@view' "$f" || echo "screen without @view: $f"; done
+   el='[a-z][a-z0-9-]*\.[a-z0-9.-]+#[a-z0-9-]+'
+   grep -oE "\`$el\`" "$doc" | tr -d '`' | sort -u > "$t/ed"
+   grep -rhoE "\"$el\"" app src 2>/dev/null | tr -d '"' | sort -u > "$t/ec"
+   comm -23 "$t/ed" "$t/ec" | sed 's/^/promised, not on any screen: /'
+   comm -13 "$t/ed" "$t/ec" | sed 's/^/on screen, not in the design: /'
+   while read -r id; do                       # one view, one implementation
+     n=$(grep -rlF "\"$id\"" app src 2>/dev/null | wc -l)
+     [ "$n" -gt 1 ] && echo "drawn in $n files: $id"
+   done < "$t/ec"
+   # d. what ids can't express — open each view row and its route side by side:
+   #    sections and their order, empty states, wording. By hand.
    ```
+
+   Without ids, (c) falls back to listing the routes and matching them to view
+   rows by hand — and then everything in (d) is by hand too. That fallback is
+   what let the failure below through; once a design doc has a view table, give
+   it ids. Put (c) in a script the `verify` chain runs, so it is a gate and not a
+   reminder.
 
    - **(a) non-empty is not automatically red** — read each listed commit. Either
      the design doc gets the change (OOUI: the object's attributes / actions, the
@@ -178,18 +195,22 @@ repeatable signal. Run it before declaring a change done and before every ship.
    - **OOUI specifics**: every action the UI exposes appears on its object (on the
      collection or the single view); actions in the model that the UI does not
      have yet are marked as later, not silently missing.
-   - **(d) is the code-behind-the-design direction** — (a) catches the doc
-     behind the code, (d) catches the code behind the doc. Real failure: the
+   - **(c) and (d) are the code-behind-the-design direction** — (a) catches
+     the doc behind the code, (c)/(d) catch the code behind the doc. Real failure: the
      OOUI view table said the exercise library has "search and muscle filters at
      the top"; the picker screen (the same collection view, used for selecting)
      had them, the library screen did not, and (a)–(c) were all green because the
      route existed and the doc was fresh. The owner found it by using the app.
-     Each promised element is either on screen or marked "later" in the row.
+     With ids, that is `promised, not on any screen: exercise.collection#search`.
+     Each promised element is either on screen or marked `later:` in the row.
+   - **A grep proves the id is in the code, not that it renders.** Rendering is
+     an E2E question (an id-driven Maestro / Playwright flow) or the device
+     checklist (#4); the ids are what those tools aim at.
    - **One view, one implementation.** When two routes render the same view
      (OOUI: a collection shown for browsing and again for picking), they share
      the component that draws it — search bar, filters, row. Two hand-written
-     copies drift; that drift is the failure above. Red is a view row whose
-     routes each build the same control themselves.
+     copies drift; that drift is the failure above. With ids it is mechanical:
+     an element id written in more than one source file is red.
 
 6. **Do not hard-code counts.** Report pass/fail and the failing output, not
    "N tests pass" — test counts drift across docs and lock nothing down.
@@ -226,11 +247,13 @@ record it with an ADR and update `CLAUDE.md` / `overview.md`'s check list.
 - **Heavy**: full gate + CI enforcing lint / boundaries / typecheck; layered tests
   (unit / property / scenario) plus the smoke. Run step 4 in CI, and add `@rev`
   so a requirement that changed under a slice reports stale instead of silent.
-  Run step 5 (a) and (b) in CI as warnings; (c) stays a human review.
+  Run step 5 (a) and (b) in CI as warnings and (c) as a failure; (d) stays a
+  human review.
 - **Light**: local `verify` + `verify:cf` scripts chained; a single focused smoke
   suite is the whole test programme — make sure it covers the recurring failure mode.
   Step 4 runs locally; `@domain` + `@serves`, no `@rev`, no matrix.
-  Step 5 runs locally whenever a UI change landed since the last gate.
+  Step 5 runs locally whenever a UI change landed since the last gate; (c) as
+  a script inside `verify`.
 - **Bare**: `cargo test` (or the one command that exists) + eyeballing fixtures.
   If there's no gate at all, that's the finding — propose the smallest useful one.
   Of step 4, keep only grep (a) and (d): `@domain` alone is nearly free and still

@@ -16,7 +16,7 @@ description: >-
   lines of evidence go inline — so use it when asking "where do survey or
   comparison findings go". This is the change-governance phase.
 metadata:
-  version: 0.8.0
+  version: 0.9.0
   last_updated: 2026-10-14
 ---
 
@@ -127,6 +127,20 @@ reversible, local choices — but when in doubt, one 15-line ADR is cheap insura
    consult `docs/design-system.md` (tokens, per-element state tables, the
    "paid in blood" implementation rules, the UI checklist). Create it from
    `templates/design-system.md` if the project is UI-heavy and lacks one.
+   If the project keeps a UI design doc with a view table (an OOUI object/view
+   model, a screen map), give it **stable ids** so `sop-verify` can check it
+   mechanically, the way `@domain` / `@serves` make the requirement docs
+   checkable:
+   - each view row carries `` `@view <object>.<view>` `` (e.g.
+     `` `@view exercise.collection` ``, `` `@view exercise.single` ``);
+   - each control or action the row promises carries
+     `` `<object>.<view>#<element>` `` (e.g. `` `exercise.collection#search` ``,
+     `` `exercise.collection#create` ``);
+   - something designed but not built yet is written `` `later:<id>` `` — the
+     check skips it, and the reader sees it is planned rather than missing.
+
+   Ids are append-only like story ids: retire one by striking it, never reuse
+   it. Order, empty states and wording stay prose — they don't get ids.
 
 7. **Update the ADR index** (`docs/adr/README.md`) — a one-line entry; carry the
    supersedes/superseded relationship in the status column/annotation.
