@@ -10,8 +10,8 @@ description: >-
   prefilled issue URL (no auth needed) when it isn't. Use sop-maintain to act on
   the issue from inside the package repo.
 metadata:
-  version: 0.9.0
-  last_updated: 2026-10-14
+  version: 0.9.1
+  last_updated: 2026-10-24
 ---
 
 # sop-feedback — turn a pain point into an issue
@@ -37,7 +37,7 @@ None. You do not need `gh`, a token, or push access to file an issue.
 1. **Classify the feedback** — one issue per problem:
    - **Guidance bug** — the skill said something wrong or misleading.
    - **Gap** — a step, check, or failure mode the skill never mentions.
-   - **Template fix** — a `templates/*.md` field is wrong, missing, or unused.
+   - **Template fix** — a `skills/<name>/templates/*.md` field is wrong, missing, or unused.
    - **Feature** — a new skill, phase, or capability.
 
 2. **Capture concrete context while it's fresh.** Vague reports produce vague

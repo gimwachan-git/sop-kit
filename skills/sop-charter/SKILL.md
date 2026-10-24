@@ -9,8 +9,8 @@ description: >-
   pick the project up. This is where project parameters are fixed, which every
   later phase reads to decide its own weight.
 metadata:
-  version: 0.9.0
-  last_updated: 2026-10-14
+  version: 0.9.1
+  last_updated: 2026-10-24
 ---
 
 # sop-charter — charter the project
@@ -47,12 +47,13 @@ layout first (but treat it as possibly stale — see the grigri lesson below).
    - If any parameter is unclear and it changes the process weight, ask **one**
      crisp question; otherwise record a reasonable default in Open Questions.
 
-3. **Write `docs/overview.md`** from `templates/overview.md`. Keep it short.
+3. **Write `docs/overview.md`** from `templates/overview.md` (bundled in this
+   skill's directory, next to this file). Keep it short.
    Every "Out of scope" line ends with *"— each is a decision; write an ADR first."*
 
-4. **Seed or update `CLAUDE.md`** from `templates/claude-md.md`: what it is, stack
-   & commands, current phase, repo structure, business rules, working conventions,
-   boundaries. This is the agent's entry point; keep it current or it rots.
+4. **Seed or update `CLAUDE.md`** from this skill's `templates/claude-md.md`: what
+   it is, stack & commands, current phase, repo structure, business rules, working
+   conventions, boundaries. This is the agent's entry point; keep it current or it rots.
 
 5. **Decide the doc architecture and cut list.** Using project parameters, state
    which later phases this project will run heavy / light / cut (e.g. "single dev

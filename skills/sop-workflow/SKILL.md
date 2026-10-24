@@ -10,8 +10,8 @@ description: >-
   / sop-ship), points at sop-feedback / sop-maintain when the workflow itself needs
   fixing, and hands the "how much" question to first-principles-software-development.
 metadata:
-  version: 0.9.0
-  last_updated: 2026-10-14
+  version: 0.9.1
+  last_updated: 2026-10-24
 ---
 
 # sop-workflow — the workflow router

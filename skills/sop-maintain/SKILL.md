@@ -9,8 +9,8 @@ description: >-
   every user's /plugin update is a silent no-op. Pairs with sop-feedback, which
   files the issues from the consuming side.
 metadata:
-  version: 0.9.0
-  last_updated: 2026-10-14
+  version: 0.9.1
+  last_updated: 2026-10-24
 ---
 
 # sop-maintain — act on feedback, then release
@@ -44,8 +44,9 @@ a skill, template, or the installer.
    ```
 
 2. **Pick one issue and scope it.** Identify exactly which file it touches —
-   `skills/<name>/SKILL.md`, a `templates/*.md`, `bin/*.sh`, or the README. If the
-   issue really contains several problems, split it rather than fixing a blur.
+   `skills/<name>/SKILL.md`, a `skills/<name>/templates/*.md`, `bin/*.sh`, or the
+   README. If the issue really contains several problems, split it rather than
+   fixing a blur.
 
 3. **Make the change.** Hold the conventions the package is built on:
    - **English only** — the whole repo, no exceptions.
@@ -95,7 +96,7 @@ a skill, template, or the installer.
 
 ## Where the artifact goes
 
-- The changed `skills/**` / `templates/**` / `bin/**` files.
+- The changed `skills/**` (including `skills/*/templates/**`) / `bin/**` files.
 - A version bump across `plugin.json`, `VERSION`, and every skill's frontmatter.
 - A commit closing the issue; optionally an ADR for a structural decision.
 

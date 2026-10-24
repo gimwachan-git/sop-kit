@@ -16,8 +16,8 @@ description: >-
   lines of evidence go inline — so use it when asking "where do survey or
   comparison findings go". This is the change-governance phase.
 metadata:
-  version: 0.9.0
-  last_updated: 2026-10-14
+  version: 0.9.1
+  last_updated: 2026-10-24
 ---
 
 # sop-design — record the decision
@@ -41,7 +41,8 @@ reversible, local choices — but when in doubt, one 15-line ADR is cheap insura
 1. **Name the decision** as a short action-title. Find the next number by scanning
    `docs/adr/` (zero-padded, e.g. `0007`). One decision per file.
 
-2. **Write the ADR** from `templates/adr.md`:
+2. **Write the ADR** from `templates/adr.md` (bundled in this skill's directory,
+   next to this file):
    - `# NNNN — Title`
    - `Status: Proposed | Accepted | Superseded by NNNN | Deferred` · `Date: YYYY-MM-DD`
    - `## Context` — the forces and the problem (fold in the rationale here).
@@ -125,8 +126,8 @@ reversible, local choices — but when in doubt, one 15-line ADR is cheap insura
 
 6. **UI work → design system.** If the change touches visual/interaction design,
    consult `docs/design-system.md` (tokens, per-element state tables, the
-   "paid in blood" implementation rules, the UI checklist). Create it from
-   `templates/design-system.md` if the project is UI-heavy and lacks one.
+   "paid in blood" implementation rules, the UI checklist). Create it from this
+   skill's `templates/design-system.md` if the project is UI-heavy and lacks one.
    If the project keeps a UI design doc with a view table (an OOUI object/view
    model, a screen map), give it **stable ids** so `sop-verify` can check it
    mechanically, the way `@domain` / `@serves` make the requirement docs

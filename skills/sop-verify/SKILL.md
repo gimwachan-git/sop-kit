@@ -19,8 +19,8 @@ description: >-
   shipped, so a design doc that silently fell behind the UI is caught. A green
   gate is the Definition of Done.
 metadata:
-  version: 0.9.0
-  last_updated: 2026-10-14
+  version: 0.9.1
+  last_updated: 2026-10-24
 ---
 
 # sop-verify — run the gate (Definition of Done)
