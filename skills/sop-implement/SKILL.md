@@ -11,7 +11,7 @@ description: >-
   obeys the project's business rules. Adapts to the stack (Nuxt/TS, Rust
   workspace, etc.). Ends by handing off to sop-verify.
 metadata:
-  version: 0.9.1
+  version: 0.10.0
   last_updated: 2026-10-24
 ---
 

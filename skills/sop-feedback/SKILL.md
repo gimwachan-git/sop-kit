@@ -10,7 +10,7 @@ description: >-
   prefilled issue URL (no auth needed) when it isn't. Use sop-maintain to act on
   the issue from inside the package repo.
 metadata:
-  version: 0.9.1
+  version: 0.10.0
   last_updated: 2026-10-24
 ---
 

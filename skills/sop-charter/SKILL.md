@@ -9,7 +9,7 @@ description: >-
   pick the project up. This is where project parameters are fixed, which every
   later phase reads to decide its own weight.
 metadata:
-  version: 0.9.1
+  version: 0.10.0
   last_updated: 2026-10-24
 ---
 

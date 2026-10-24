@@ -101,7 +101,7 @@ skills/
   sop-workflow/   router + tailoring entry point
   sop-charter/    docs/overview.md (goals + project parameters) + seed CLAUDE.md
   sop-specify/    docs/requirements/<feature>.md (US + acceptance) + traceability.md
-  sop-design/     docs/adr/NNNN-*.md + docs/research/ + FSD placement + @domain slug + optional design-system.md
+  sop-design/     docs/adr/NNNN-*.md + docs/research/ + FSD placement + @domain slug + optional design-system.md / model-links.md
   sop-implement/  task breakdown + FSD boundaries + @domain/@serves headers + the three pillars
   sop-verify/     run the gate chain, incl. the docs<->code binding check = Definition of Done
   sop-ship/       version bump + build + deploy, in gated order

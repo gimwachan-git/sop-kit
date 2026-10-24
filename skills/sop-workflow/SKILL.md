@@ -10,7 +10,7 @@ description: >-
   / sop-ship), points at sop-feedback / sop-maintain when the workflow itself needs
   fixing, and hands the "how much" question to first-principles-software-development.
 metadata:
-  version: 0.9.1
+  version: 0.10.0
   last_updated: 2026-10-24
 ---
 

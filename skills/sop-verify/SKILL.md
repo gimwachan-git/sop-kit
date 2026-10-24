@@ -16,10 +16,13 @@ description: >-
   modules and built-nothing requirements surface here instead of never. And it
   checks the UI design doc (an OOUI object/view model, a screen map, the page
   table in design-system.md) against the user stories and the screens actually
-  shipped, so a design doc that silently fell behind the UI is caught. A green
+  shipped, so a design doc that silently fell behind the UI is caught, and checks
+  the data model behind it — every *_id or shared-name column registered with a
+  class (own / part-of / join / reference / snapshot / deprecated / to-fix) — so
+  objects that copy or point past each other's attributes are flagged. A green
   gate is the Definition of Done.
 metadata:
-  version: 0.9.1
+  version: 0.10.0
   last_updated: 2026-10-24
 ---
 
@@ -128,7 +131,8 @@ repeatable signal. Run it before declaring a change done and before every ship.
    commits — a simplified preview, a back-button confirm, an accordion, new
    actions on two objects — landed after the OOUI doc's last edit; the doc still
    described screens that no longer existed, and nothing flagged it until the
-   owner asked "was this synced?". Four checks:
+   owner asked "was this synced?". Four checks on the screens, plus (e) on the
+   data model behind them:
 
    ```bash
    # a. freshness — UI commits made after the design doc last changed.
@@ -211,6 +215,49 @@ repeatable signal. Run it before declaring a change done and before every ship.
      the component that draws it — search bar, filters, row. Two hand-written
      copies drift; that drift is the failure above. With ids it is mechanical:
      an element id written in more than one source file is red.
+   - **A collection row shows only the object's own attributes.** Reverse
+     relations ("used in …", the plan a workout belongs to) go at most in the
+     single view. No grep sees this; check it in (d).
+
+   **(e) Model ↔ object binding** (projects with a data model and the registry
+   from `sop-design` step 7). Steps (a)–(d) compare screens with the design; none
+   of them looks at the tables, and the coupling sop-design step 7 describes
+   passed every one of them for ten days. Every link-like column must carry a
+   class, so a new one cannot slip in unclassified:
+
+   ```bash
+   # e. model ↔ object binding (sop-design step 7). The awk line lists
+   #    table.column from a Drizzle schema — the one stack-specific part; swap
+   #    it for the project's (Prisma model blocks, SQL migrations, the field
+   #    names of a document store).
+   schema=src/shared/db/schema.ts; reg=docs/design/model-links.md; t=$(mktemp -d)
+   awk 'match($0, /Table\("[a-z_]+"/) { t = substr($0, RSTART+7, RLENGTH-8) }
+        t && match($0, /[a-z]+\("[a-z_]+"/) { c = substr($0, RSTART, RLENGTH)
+          sub(/^[a-z]+\("/, "", c); sub(/"$/, "", c); print t "." c }' "$schema" |
+     grep -vE '\.(id|created_at|updated_at|deleted_at)$' | sort -u > "$t/all"
+   cut -d. -f2 "$t/all" | sort | uniq -d > "$t/shared"   # names in 2+ tables
+   awk -F. -v s="$t/shared" 'BEGIN { while ((getline l < s) > 0) sh[l] = 1 }
+        $2 ~ /_id$/ || ($2 in sh)' "$t/all" > "$t/need"
+   grep -oE '^\| *`[a-z_]+\.[a-z_]+` *\| *[a-z-]+ *\|' "$reg" |
+     sed -E 's/^\| *`([^`]*)` *\| *([a-z-]+) *\|/\1 \2/' | sort -u > "$t/reg"
+   awk '$2 !~ /^(own|part-of|join|reference|snapshot|deprecated|to-fix)$/ {
+          print "unknown class " $2 ": " $1 }' "$t/reg"
+   cut -d' ' -f1 "$t/reg" | sort -u > "$t/regcols"
+   comm -23 "$t/need" "$t/regcols" | sed 's/^/unregistered link-like column: /'
+   comm -13 "$t/all" "$t/regcols" | sed 's/^/registered, not in the schema: /'
+   awk '$2 == "to-fix"' "$t/reg" | wc -l | xargs printf '(note) %s known coupling(s) to fix\n'
+   ```
+
+   - **Red**: an unregistered link-like column, a registered column the schema
+     no longer has, an unknown class. **Not red**: `to-fix` rows — they are known,
+     numbered, and counted, so the debt stays visible without blocking the gate.
+     A new violation goes on the to-fix list deliberately, not by default.
+   - **The registry proves a column was classified, not that the class is
+     right.** Read each new row: a `part-of` must point at its direct whole, a
+     `reference` must not sit next to copies of the target's name or image. In
+     the real project one `to-fix` row was itself withdrawn on review — the
+     "whole" it assumed was only a label.
+   - Put (e) in a script the `verify` chain runs, like (c).
 
 6. **Do not hard-code counts.** Report pass/fail and the failing output, not
    "N tests pass" — test counts drift across docs and lock nothing down.
@@ -241,24 +288,28 @@ record it with an ADR and update `CLAUDE.md` / `overview.md`'s check list.
       and actions are on its screen (or marked later), routes that render the same
       view share its component, and no screen contradicts an AC that wasn't
       revised.
+- [ ] Data model (if any): every link-like column is registered with a class in
+      `docs/design/model-links.md`, no registered column is gone from the
+      schema, and the to-fix count was reported — not hidden.
 
 ## Tailoring by project weight
 
 - **Heavy**: full gate + CI enforcing lint / boundaries / typecheck; layered tests
   (unit / property / scenario) plus the smoke. Run step 4 in CI, and add `@rev`
   so a requirement that changed under a slice reports stale instead of silent.
-  Run step 5 (a) and (b) in CI as warnings and (c) as a failure; (d) stays a
-  human review.
+  Run step 5 (a) and (b) in CI as warnings and (c) and (e) as failures; (d)
+  stays a human review.
 - **Light**: local `verify` + `verify:cf` scripts chained; a single focused smoke
   suite is the whole test programme — make sure it covers the recurring failure mode.
   Step 4 runs locally; `@domain` + `@serves`, no `@rev`, no matrix.
-  Step 5 runs locally whenever a UI change landed since the last gate; (c) as
-  a script inside `verify`.
+  Step 5 runs locally whenever a UI change landed since the last gate; (c) and
+  (e) as scripts inside `verify`.
 - **Bare**: `cargo test` (or the one command that exists) + eyeballing fixtures.
   If there's no gate at all, that's the finding — propose the smallest useful one.
   Of step 4, keep only grep (a) and (d): `@domain` alone is nearly free and still
   buys the glossary, even in a project that cut requirement docs entirely.
   Step 5 applies only if a UI design doc exists; then keep (a) — it is one command.
+  (e) applies once there is a schema with more than a couple of tables.
 
 Whether a missing check is worth adding is a P3 cost/benefit question — invoke
 `first-principles-software-development` when unsure.

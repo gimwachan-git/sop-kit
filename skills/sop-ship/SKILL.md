@@ -9,7 +9,7 @@ description: >-
   notes the deploy:raw escape hatch without encouraging it, and updates CLAUDE.md's
   current phase after shipping. This is the release-governance phase.
 metadata:
-  version: 0.9.1
+  version: 0.10.0
   last_updated: 2026-10-24
 ---
 

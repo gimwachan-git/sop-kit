@@ -16,7 +16,7 @@ description: >-
   lines of evidence go inline — so use it when asking "where do survey or
   comparison findings go". This is the change-governance phase.
 metadata:
-  version: 0.9.1
+  version: 0.10.0
   last_updated: 2026-10-24
 ---
 
@@ -143,7 +143,44 @@ reversible, local choices — but when in doubt, one 15-line ADR is cheap insura
    Ids are append-only like story ids: retire one by striking it, never reuse
    it. Order, empty states and wording stay prose — they don't get ids.
 
-7. **Update the ADR index** (`docs/adr/README.md`) — a one-line entry; carry the
+7. **Data-shape change → classify every link-like column.** When the decision
+   adds, splits, or reuses a table (or a document collection), the objects behind
+   it must stay apart: **an object stores — and shows — only its own
+   attributes.** Copying another object's name, image, or title into a row, or
+   pointing at a grandparent "for convenience", is coupling: the copies need batch
+   updates, and the stale ones leak onto screens. The rules (cf. Vernon,
+   *Effective Aggregate Design*: reference other aggregates by identity):
+   - two independent objects relate through a **join table**; neither knows the other;
+   - only a **part** that lives inside one whole may point at that whole — its
+     *direct* whole, not the whole's parent too;
+   - an inherently single "which one is it" link may be a plain **reference** by
+     id — never a copy of the target's content. When it may become many-to-many
+     or the link needs attributes of its own, it becomes a join table.
+
+   Keep a registry, `docs/design/model-links.md`, with one row per **link-like
+   column** — every column named `*_id`, and every column whose name appears in
+   two or more tables — as `` | `table.column` | class | note | ``, class one of:
+
+   | Class | Meaning |
+   |-------|---------|
+   | `own` | the object's own attribute (it only shares a name) |
+   | `part-of` | a part pointing at its direct whole |
+   | `join` | a column of a join table between independent objects |
+   | `reference` | an inherently single link by id; copies nothing |
+   | `snapshot` | a record of what was true then (a log, a receipt); not updated afterwards |
+   | `deprecated` | nothing reads or writes it any more; waiting for a migration to drop it |
+   | `to-fix` | a known violation, numbered in a to-fix list below the table |
+
+   In the ADR's Consequences, list every column the change leaves behind with its
+   class — a reused table's old columns are where the coupling hides. Paid for in
+   a real project: an ADR reused an old table for a new object "without renaming
+   columns"; the rows kept `plan_id`, `day_index`, and a title with "Day 1" baked
+   in, exercise rows copied the library entry's name and images, and event tables
+   pointed at both parent and grandparent. The gate stayed green for ten days —
+   no rule existed to check against — until the owner saw "Day 1" on a list row.
+   `sop-verify` step 5 (e) checks the registry against the schema.
+
+8. **Update the ADR index** (`docs/adr/README.md`) — a one-line entry; carry the
    supersedes/superseded relationship in the status column/annotation.
 
 ## Where the artifact goes
@@ -155,6 +192,8 @@ reversible, local choices — but when in doubt, one 15-line ADR is cheap insura
   from `overview.md`'s Open Questions while undecided, cited from the ADR once one
   exists; one-line index in `docs/research/README.md`.
 - `docs/design-system.md` — UI tokens + interaction rules + checklist (UI projects).
+- `docs/design/model-links.md` — the class of every link-like column (projects
+  with a data model).
 
 ## Quality checklist / Gate
 
@@ -172,6 +211,8 @@ reversible, local choices — but when in doubt, one 15-line ADR is cheap insura
       summarizes **and** cites. None of it exists only in the chat.
 - [ ] The ADR stays near the template's size (10–30 lines of prose plus a short
       table). If it has grown past that, the survey belongs in `docs/research/`.
+- [ ] A data-shape change lists every column it adds or leaves behind with its
+      class, and `docs/design/model-links.md` is updated to match.
 - [ ] Index updated; cross-references present.
 
 ## Tailoring by project weight
